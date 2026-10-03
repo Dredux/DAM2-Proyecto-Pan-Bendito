@@ -1,0 +1,64 @@
+# =========================
+# .NET 10 / C# / WPF
+# =========================
+bin/
+obj/
+*.user
+*.rsuser
+*.suo
+*.userprefs
+*.cache
+*.pdb
+*.ilk
+*.log
+*.vspscc
+*.vssscc
+.vs/
+TestResults/
+*.nupkg
+packages/
+
+# Rider / VS Code
+.idea/
+.vscode/
+
+# =========================
+# Python / Odoo (si aplica)
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+odoo/addons/*/static/lib/
+
+# =========================
+# Android Studio (si aplica)
+# =========================
+.gradle/
+local.properties
+captures/
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+*.iml
+*.hprof
+build/
+
+# =========================
+# Archivos de sistema
+# =========================
+.DS_Store
+Thumbs.db
