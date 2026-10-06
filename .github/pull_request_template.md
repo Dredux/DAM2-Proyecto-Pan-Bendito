@@ -15,6 +15,7 @@ Closes #X
 - [ ] Avisos por correo sobre pagos de royalties
 - [ ] Páginas web y ofertas
 - [ ] Comunicación interna entre matriz y franquicias
+- [ ] Infraestructura, configuración o documentación
 
 ## Pruebas realizadas
 - [ ] Pruebas unitarias
