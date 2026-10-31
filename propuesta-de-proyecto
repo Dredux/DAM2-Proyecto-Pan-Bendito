@@ -1,0 +1,95 @@
+## 2.1. Revisión de Sistemas Existentes
+
+### 2.1.1. Obradores QBS
+
+* **Tipo:** Comercial / Licencia propietaria perpetua de escritorio [1].
+* **Plataforma:** Aplicación de escritorio (Microsoft Windows) con opción de despliegue en servidor privado del cliente.
+* **URL oficial:** https://qbssoftware.com/software-panaderias/
+
+Obradores QBS es una solución ERP vertical orientada a la gestión de panaderías y confiterías que abarca compras, escandallos, trazabilidad y control de rutas [1]. Su mayor ventaja radica en la soberanía de los datos al operar en infraestructura local bajo un esquema de pago único sin cuotas recurrentes obligatorias. Sin embargo, su arquitectura adolece de un modelo de integración rígido: la sincronización con terminales de punto de venta externos se efectúa mediante ficheros planos vía FTP/SFTP cada dos horas, careciendo de comunicación en tiempo real y confirmación bidireccional de albaranes [1]. Asimismo, su naturaleza de cliente de escritorio para Windows restringe la movilidad en ruta y carece de acreditación formal en pautas de accesibilidad WCAG 2.1 [2].
+
+### 2.1.2. ERPNext
+
+* **Tipo:** Open-Source (Licencia GNU General Public License v3) [3].
+* **Plataforma:** Aplicación Web (navegador multiplataforma) y aplicación móvil responsiva; arquitectura sobre Python (Frappe Framework) y MariaDB/PostgreSQL.
+* **URL oficial / Repositorio:** https://github.com/frappe/erpnext
+
+ERPNext es una plataforma empresarial integral de código abierto que cubre compras, inventario y fabricación con soporte para listas de materiales (BOM) y seguimiento estricto de lotes [3]. Su principal virtud técnica radica en su API REST nativa completa basada en formato JSON, lo que simplifica la intercomunicación con sistemas externos mediante llamadas HTTP estándar. No obstante, al constituir un ERP corporativo horizontal, carece de una interfaz ágil para terminales móviles de reparto; la operativa en carretera resulta compleja de parametrizar, no incorpora un canal de mensajería bidireccional nativo para incidencias logísticas y no certifica conformidad con las directrices de accesibilidad WCAG 2.1 AA [2], demandando además un elevado consumo de memoria en servidor.
+
+### 2.1.3. Método Tradicional No Automatizado (Hojas de Cálculo y Registro en Papel)
+
+* **Tipo:** Método manual / herramienta genérica no especializada (hojas de cálculo ofimáticas y albaranes físicos en papel).
+
+El procedimiento manual tradicional sigue siendo el sistema operativo dominante en pequeños obradores locales y flotas de reparto independientes. Se apoya en libros de cálculo estáticos (Microsoft Excel o LibreOffice Calc) para consolidar los pedidos diarios y en la impresión de albaranes físicos que los conductores cumplimentan y firman a mano durante la entrega. Esta práctica resulta insuficiente para las necesidades de trazabilidad del proyecto: carece por completo de control de concurrencia y aislamiento transaccional frente a pérdidas de datos, introduce desfases de 24 a 48 horas en la facturación y anula cualquier capacidad de reacción ante incidencias de tráfico o modificaciones de entrega en tiempo real.
+
+## 2.2. Análisis Comparativo (Benchmarking)
+
+| Característica / Criterio | **Obradores QBS** [1] | **ERPNext** [3] | **Método Manual (Excel / Papel)** | **Pan Bendito (Nuestra Propuesta)** |
+| :--- | :--- | :--- | :--- | :--- |
+| **Plataforma** | Escritorio Windows nativo con soporte para servidor privado. | Plataforma Web (SaaS / Autoalojado) accesible vía navegador. | Archivos locales de hoja de cálculo en PC y documentos físicos impresos. | Ecosistema unificado: Desktop (Compose Multiplatform), App móvil nativa (Jetpack Compose) y Backend (Ktor). |
+| **Coste de Licencia** | Licencia comercial de pago único (módulos homólogos del fabricante rondan los 580 €) [1]. | Código abierto (GNU GPL v3); coste de licencia de software 0 € (requiere servidor). | Licencia ofimática estándar (o suite libre) junto a costes recurrentes de papel e impresión. | Software propio bajo licencia libre; coste de licencia nulo para la red de franquicias. |
+| **Rendimiento / Fluidez** | Dependiente del hardware local; sincronización externa por lotes cada 2 horas. | Dependiente de la red y servidor; latencias variables bajo concurrencia media. | Fluidez local condicionada al peso del fichero y a la transcripción manual de datos. | Máxima fluidez: UI acelerada por Skia/GPU, APK nativa en ART, WebSockets de baja latencia y consultas indexadas. |
+| **Persistencia Transaccional (ACID)** | Motor relacional local con soporte transaccional implícito para stock y ventas. | Motor relacional (MariaDB/PostgreSQL) con cumplimiento transaccional ACID estricto [3]. | **Inexistente**: Hojas de cálculo sin control de aislamiento ni bloqueos seguros ante fallos. | Base de datos relacional centralizada (PostgreSQL) con Exposed ORM, claves foráneas y aislamiento ACID estricto. |
+| **Accesibilidad (WCAG 2.1)** | **No documentada**: Supeditada a los asistentes de accesibilidad propios de Windows. | **No documentada**: Sin declaración de conformidad formal con WCAG 2.1 nivel AA [2]. | **Nula**: El formato físico y los libros ofimáticos no contemplan accesibilidad ni alto contraste. | **No contemplada en MVP**: Alcance inicial enfocado en ergonomía y contraste; proyectada para versiones futuras. |
+| **Generación de Informes PDF** | Listados de control y tickets; no documenta generación vectorial nativa de analítica [1]. | Informes HTML imprimibles y exportación básica de documentos mercantiles en PDF [3]. | Exportación manual delegada en el diálogo de impresión de la suite ofimática. | Motor OpenPDF en backend para emisión de albaranes y facturas vectoriales estructuradas en memoria (CU-04). |
+| **Integración con otros sistemas** | Intercambio asíncrono **por ficheros** (SFTP/FTP) sin confirmación en tiempo real [1]. | **API REST nativa completa** (JSON) para todas las entidades y webhooks [3]. | **Nula**: Aislamiento absoluto de la información en archivos locales o carpetas físicas. | Backend desacoplado Ktor con endpoints REST/RPC hacia ERP externo (ERPNext/Dolibarr) y sockets para app móvil. |
+| **Soporte y Comunidad** | Soporte técnico comercial privado sujeto a contratación de mantenimiento [1]. | Amplia comunidad internacional de código abierto, foros oficiales y repositorios activos [3]. | Soporte no especializado dependiente de foros ofimáticos genéricos o asistencia interna. | Soporte directo del equipo de desarrollo, repositorio documentado en GitHub y código auditable. |
+
+### Interpretación y Justificación de la Propuesta Propia
+
+La matriz de benchmarking revela una acusada polarización en el sector productivo analizado. Por un lado, las soluciones comerciales maduras como **Obradores QBS** resuelven la lógica interna de fabricación artesana, pero penalizan la inmediatez logística al depender de sincronizaciones diferidas por ficheros cada dos horas y restringir su uso a estaciones fijas de escritorio [1]. Por otro lado, las suites integrales como **ERPNext** aportan una arquitectura web desacoplada y una API moderna, pero su alta densidad funcional genera fricción en terminales móviles de reparto al carecer de flujos rápidos de entrega e integración de mensajería instantánea [3]. Finalmente, la persistencia del **método manual** perpetúa errores de transcripción, albaranes extraviados y falta de trazabilidad económica.
+
+Estas limitaciones fundamentan el desarrollo de **Pan Bendito**: una plataforma especializada que combina un panel de administración de escritorio optimizado para la gestión del obrador con una aplicación móvil estrictamente nativa para conductores, vinculadas a través de un backend asíncrono y ligero en Kotlin que centraliza los albaranes inteligentes, las compras y la comunicación en tiempo real.
+
+## 2.3. Justificación del Stack Tecnológico
+
+### Capa de Presentación (Interfaz de Usuario)
+
+Para el cliente de gestión del franquiciado se ha seleccionado **Compose Multiplatform (Desktop) sobre la JVM** [4], frente a tecnologías tradicionales como JavaFX o contenedores web de escritorio basados en Electron. A diferencia de Electron, que requiere empaquetar una instancia completa de Chromium y Node.js con un elevado coste en memoria RAM y tiempos de arranque lentos, Compose Desktop compila nativamente sobre la JVM y dibuja la interfaz directamente mediante **Skia** [4] —el motor gráfico de alto rendimiento en C++ empleado en Google Chrome y Android—. Frente a JavaFX o Windows Forms, Compose adopta el paradigma declarativo reactivo moderno, permitiendo estructurar interfaces complejas mediante componentes desacoplados (`@Composable`) y flujos de estado (`StateFlow`).
+
+En la aplicación móvil del repartidor se implementa **Android Nativo con Kotlin y Jetpack Compose** [5]. Esta elección descarta el uso de contenedores híbridos (*WebViews* empaquetadas como Apache Cordova o Capacitor) para asegurar un rendimiento nativo estricto sobre la máquina virtual de Android (ART), garantizando el cumplimiento de las directrices académicas del módulo de Dispositivos Móviles. Permite, además, interactuar directamente con las APIs de bajo nivel del sistema operativo: geoposicionamiento en segundo plano (`FusedLocationProviderClient`) y captura fotográfica local mediante **CameraX** junto al SDK de **Google ML Kit (Text Recognition)** para el escaneado de albaranes (CU-05) [5].
+
+La convergencia de Jetpack Compose en móvil y Compose Multiplatform en escritorio permite compartir un **módulo común (`commonMain`)** con los modelos de dominio (DTOs), contratos de red y validaciones de negocio, eliminando la duplicidad de código y asegurando que cualquier cambio de interfaz comparta el mismo lenguaje y filosofía reactiva.
+
+### Capa de Persistencia (Base de Datos y ORM)
+
+La persistencia de datos centralizada se articula mediante el sistema gestor relacional **PostgreSQL** complementado con el framework **Exposed (JetBrains)** y el pool de conexiones de alto rendimiento **HikariCP** [6].
+
+Frente a soluciones NoSQL (como MongoDB), PostgreSQL proporciona garantías transaccionales **ACID** estrictas, indispensables para preservar la coherencia en pedidos B2B, líneas de albarán y compras a proveedores (CU-06). Asimismo, su soporte optimizado para columnas de tipo `JSONB` permite indexar y almacenar atributos semiestructurados procedentes del importador inteligente de facturas (CU-05) sin romper la normalización relacional [6].
+
+La elección de **Exposed** frente a ORMs tradicionales de Java (como Hibernate/JPA) responde a su diseño específico para Kotlin. Hibernate exige clases mutables con constructores vacíos que rompen la inmutabilidad de las `data class` y genera sobrecarga por reflexión en tiempo de ejecución. Por el contrario, Exposed ofrece un **SQL DSL fuertemente tipado** (*type-safe*), donde las consultas se escriben en Kotlin puro y se validan en tiempo de compilación frente a fallos de tipado o nombres de columnas, integrándose de forma nativa con corrutinas mediante transacciones asíncronas (`newSuspendedTransaction`) [6].
+
+### Capa de Backend y Servicios
+
+El núcleo de servicios se implementa mediante **Ktor Server**, el framework asíncrono y ligero desarrollado por JetBrains, adoptando una arquitectura RESTful autenticada mediante tokens **JWT (JSON Web Tokens)** [7].
+
+Frente a alternativas empresariales pesadas como Spring Boot o entornos basados en JavaScript como Node.js con Express, Ktor prescinde de inyección de dependencias pesada por reflexión, alcanzando un inicio de ejecución prácticamente instantáneo y un consumo de memoria en reposo inferior a 100 MB [7]. La gestión de la concurrencia no bloqueante se sustenta en **Corrutinas de Kotlin**, lo que permite atender miles de conexiones simultáneas mediante hilos ligeros cooperativos sin agotar la memoria del sistema operativo ni provocar bloqueos en llamadas a base de datos.
+
+Para la comunicación interactiva entre el franquiciado y los repartidores (CU-03), se integra el plugin nativo de **WebSockets de Ktor** [7]. Este mecanismo canaliza eventos bidireccionales en tiempo real sobre una única conexión TCP persistente, gestionando salas de mensajería por franquicia y recuperando el flujo de datos tras pérdidas temporales de cobertura en los terminales móviles.
+
+### Librerías y Servicios Auxiliares
+
+El sistema se complementa con un conjunto de librerías especializadas y contrastadas en la industria:
+
+* **OpenPDF (LibrePDF):** Se selecciona como motor de generación documental en el backend para el CU-04 [8]. Es una biblioteca de código abierto libre (licencia LGPL) derivada del núcleo de iText clásico. Permite generar en memoria documentos PDF vectoriales estandarizados (albaranes, fichas de pedido e informes de actividad) con mínimo consumo de recursos, devolviendo los bytes generados a través de un endpoint HTTP de Ktor sin necesidad de levantar navegadores *headless*.
+* **jBcrypt (`org.mindrot:jbcrypt`):** Biblioteca criptográfica estándar de la JVM para el almacenamiento seguro de credenciales de acceso. Aplica una función de derivación de claves basada en Blowfish con *salting* automático de 128 bits y factor de coste configurable (work factor), mitigando ataques de fuerza bruta y precomputación de tablas arcoíris.
+* **kotlinx.serialization:** Motor oficial de serialización de JetBrains con soporte multiplataforma. Transforma estructuras de datos complejas a JSON y viceversa en tiempo de compilación sin recurrir a reflexión en tiempo de ejecución, acelerando las transferencias cliente-servidor.
+* **Google ML Kit (Text Recognition) & CameraX:** Conjunto de APIs integradas nativamente en la aplicación Android del repartidor para ejecutar el reconocimiento óptico de caracteres de forma local y offline, reduciendo la latencia de procesado de facturas y eliminando costes de servicios de visión artificial en la nube.
+
+# Bibliografía
+
+[1] QBS Software, «Software para Panaderías, Pastelerías y Confiterías», *QBS Software S.L.*, 2024. [En línea]. Disponible en: https://qbssoftware.com/software-panaderias/. [Accedido: 31-oct-2026].
+
+[2] W3C, «Web Content Accessibility Guidelines (WCAG) 2.1», *W3C Recommendation*, jun. 2018. [En línea]. Disponible en: https://www.w3.org/TR/WCAG21/. [Accedido: 31-oct-2026].
+
+[3] Frappe Technologies, «ERPNext: Free and Open Source Cloud ERP», *Frappe Framework Documentation*, 2025. [En línea]. Disponible en: https://github.com/frappe/erpnext. [Accedido: 31-oct-2026].
+
+[4] JetBrains, «Compose Multiplatform: Declarative UI for Kotlin», *JetBrains Documentation*, 2025. [En línea]. Disponible en: https://www.jetbrains.com/lp/compose-multiplatform/. [Accedido: 31-oct-2026].
+
+[5] Google Developers, «Jetpack Compose: Toolkit moderno para compilar interfaces nativas de Android», *Android Developers*, 2025. [En línea]. Disponible en: https://developer.android.com/jetpack/compose. [Accedido: 31-oct-2026].
+
+[6] JetBrains, «Exposed: An SQL library for Kotlin», *GitHub Documentation*, 2025. [En línea]. Disponible en: https://github.com/JetBrains/Exposed. [Accedido: 31-oct-2026].
+
+[7] JetBrains, «Ktor: Asynchronous framework for creating microservices, web applications, and more», *Ktor Documentation*, 2025. [En línea]. Disponible en: https://ktor.io/docs/. [Accedido: 31-oct-2026].
+
+[8] LibrePDF, «OpenPDF: Open source Java library for creating and editing PDF files», *GitHub*, 2025. [En línea]. Disponible en: https://github.com/LibrePDF/OpenPDF. [Accedido: 31-oct-2026].
